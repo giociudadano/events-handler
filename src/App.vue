@@ -1,6 +1,7 @@
 <template>
   <navigation-bar />
   <router-view />
+  <boothSelector />
 </template>
 
 <style lang="scss">
@@ -9,11 +10,13 @@
 
 <script>
 import navigationBar from './components/navigation-bar.vue';
+import boothSelector from './views/BoothSelectorView.vue';
 
 export default {
   name: 'App',
   components: {
-    navigationBar
+    navigationBar,
+    boothSelector
   },
   mounted() {
     const plugin = document.createElement('script');
