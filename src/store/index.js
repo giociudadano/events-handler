@@ -1,9 +1,15 @@
 import { createStore } from 'vuex';
 
 export default createStore({
-  state: {},
-  getters: {},
-  mutations: {},
+  state: {
+    eventName: '' // Initialize with an empty value
+  },
+  mutations: {
+    setEventName(state, eventName) {
+      state.eventName = eventName;
+    }
+  },
   actions: {},
-  modules: {}
+  modules: {},
+  getters: {}
 });
