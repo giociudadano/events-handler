@@ -2,7 +2,7 @@
 
 module.exports = (mongoose, Schema) => {
   const EventSchema = new Schema({
-    name: { type: String, required: true }
+    event_name: { type: String }
   });
 
   return mongoose.model('Events', EventSchema);

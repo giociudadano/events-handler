@@ -5,18 +5,11 @@ const getEvents = require('./getEvents');
 
 // eslint-disable-next-line
 module.exports = async ({ query }) => {
-  return {
-    event_name: 'Game Developers Summit 2023',
-    event_background: {
-      desktop: 'gamedev-desktop.jpg',
-      mobile: 'gamedev-mobile.jpg'
-    },
-    booths: [
-      'Game Engines',
-      'Monetization Practices',
-      'Music in Games',
-      'Collaborative Development',
-      'Games as a Service'
-    ]
-  };
+  if (query.event) {
+    return await getEvents({ query });
+  } else {
+    throw Error(
+      'KeyRequiredError: No event key found when attempting to query for list of events'
+    );
+  }
 };
