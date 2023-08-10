@@ -11,7 +11,6 @@ const routes = [
   {
     path: '/checker/:event',
     name: 'booth-selector',
-    title: 'Events Handler',
     component: () => {
       return import('../views/BoothSelectorView.vue');
     }

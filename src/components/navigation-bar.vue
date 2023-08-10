@@ -5,8 +5,8 @@
     aria-label="main navigation"
   >
     <div class="navbar-brand">
-      <a class="navbar-item">
-        <img class="website-icon" height="32" />
+      <a class="navbar-item" :href="links.home">
+        <img class="website-icon" height="32" :src="images.icon" />
         <p class="website-name">
           EVENTS<span class="text-green">.HANDLER</span>
         </p>
@@ -14,16 +14,16 @@
     </div>
     <div class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item">Home</a>
-        <a class="navbar-item">Registration</a>
-        <a class="navbar-item">Search</a>
-        <a class="navbar-item">Booths</a>
-        <a class="navbar-item">Souvenirs</a>
+        <a class="navbar-item" :href="links.home">Home</a>
+        <a class="navbar-item" :href="links.registration">Registration</a>
+        <a class="navbar-item" :href="links.search">Search</a>
+        <a class="navbar-item" :href="links.booths">Booths</a>
+        <a class="navbar-item" :href="links.souvenir">Souvenirs</a>
       </div>
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a class="button is-primary">
+            <a class="button is-primary" :href="links.donation">
               <span class="icon">
                 <i class="fas fa-heart"></i>
               </span>
@@ -36,7 +36,7 @@
   </nav>
 </template>
 
-<style lang="scss">
+<style>
 .text-green {
   color: rgb(68, 187, 136);
 }
@@ -71,3 +71,23 @@
   background-color: rgb(68, 187, 136) !important;
 }
 </style>
+
+<script>
+export default {
+  data() {
+    return {
+      images: {
+        icon: require('@/assets/icon.png')
+      },
+      links: {
+        home: '/',
+        registration: '/register',
+        search: '/search',
+        booths: '/checker',
+        souvenir: '/souvenir',
+        donation: 'https://www.buymeacoffee.com'
+      }
+    };
+  }
+};
+</script>
