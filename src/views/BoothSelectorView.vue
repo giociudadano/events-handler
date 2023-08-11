@@ -11,13 +11,13 @@
               <div v-show="!loading.dropdown && !views.dropdown">
                 <small id="error-handler" class="error-handler"></small>
               </div>
-              <div v-show="views.dropdown">
+              <div v-if="views.dropdown">
                 <div class="field">
                   <label class="label is-small">Event Name</label>
                   <input
                     class="input is-small is-primary"
                     type="text"
-                    :value="event ? event.event_name : ''"
+                    :value="event.event_name"
                     disabled
                   />
                 </div>
@@ -28,7 +28,7 @@
                       <select id="booth-selector" @change="onBoothChange">
                         <option>Select a booth</option>
                         <option
-                          v-for="booth in event ? event.booths : []"
+                          v-for="booth in event.booths"
                           :value="booth"
                           :key="booth"
                         >
