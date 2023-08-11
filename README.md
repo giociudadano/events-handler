@@ -4,13 +4,23 @@
 <b>Events Handler</b> is a full-stack website application assistant for setting up events. The application includes features to register users, set up booths, and claim souvenirs.
 </p>
 
-<a align=center href=https://documenter.getpostman.com/view/28831400/2s9Xy3tBrT>[Postman Documentation]</a>
+<h5><a align=center href=https://documenter.getpostman.com/view/28831400/2s9Xy3tBrT>[API Documentation]</a></h5>
 </div>
 
 ## Getting started
-To launch the application:
+**Launch application**
 ```
 npm install
 npm run client
 npm run server
+```
+
+## Webpages
+**Booth Selector**
+```
+/checker/:event
+```
+**Booth Check-In**
+```
+/checker/:event/:booth
 ```
