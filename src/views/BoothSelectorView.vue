@@ -1,19 +1,27 @@
 <template>
-  <div class="about">
-    <br /><br /><br />
-    <div class="box">
-      Event Name: {{ eventName }} <br />
-      <label for="boothSelector">Select Booth:</label>
-      <select v-model="selectedBooth" id="boothSelector">
-        <option v-for="booth in booths" :value="booth" :key="booth">
-          {{ booth }}
-        </option>
-      </select>
-      <button class="is-primary">
-        <router-link :to="`/checker/${eventName}/${selectedBooth}`"
-          >Go to QR</router-link
-        >
-      </button>
+  <div class="container">
+    <div class="about">
+      <br /><br /><br />
+      <div class="box">
+        Event Name: {{ eventName }} <br />
+        <label for="boothSelector">Select Booth:</label>
+        <div class="dropdown is-active">
+          <div class="dropdown-trigger">
+            <div class="select">
+              <select v-model="selectedBooth" id="boothSelector">
+                <option v-for="booth in booths" :value="booth" :key="booth">
+                  {{ booth }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <button class="button is-primary">
+          <router-link :to="`/checker/${eventName}/${selectedBooth}`"
+            >Go to Booth</router-link
+          >
+        </button>
+      </div>
     </div>
   </div>
 </template>

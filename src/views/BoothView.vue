@@ -8,8 +8,24 @@
       <p>{{ decodedString }}</p>
     </div>
     <div class="box">
-      <p>{{ error }}</p>
-      <qrcode-stream @init="onInit" @decode="onDecode"></qrcode-stream>
+      <button
+        @click="startQRScanner"
+        v-if="!qrScannerActive"
+        class="button is-link"
+      >
+        Start QR Scanner
+      </button>
+      <button
+        @click="stopQRScanner"
+        v-if="qrScannerActive"
+        class="button is-link"
+      >
+        Stop QR Scanner
+      </button>
+      <div v-if="qrScannerActive">
+        <p>{{ error }}</p>
+        <qrcode-stream @init="onInit" @decode="onDecode"></qrcode-stream>
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +35,7 @@ import { QrcodeStream } from 'vue3-qrcode-reader';
 export default {
   data() {
     return {
+      qrScannerActive: false,
       error: '',
       decodedString: '',
       torch: false
@@ -29,6 +46,13 @@ export default {
     QrcodeStream
   },
   methods: {
+    startQRScanner() {
+      this.qrScannerActive = true;
+    },
+    stopQRScanner() {
+      this.qrScannerActive = false;
+      this.decodedString = ''; // Clear decoded string when stopping
+    },
     async onInit() {
       try {
         // Do not await the promise here to ask for camera access permission every time
