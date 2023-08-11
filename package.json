@@ -20,7 +20,7 @@
     "typescript": "^5.1.6",
     "vue": "^3.2.13",
     "vue-qrcode-reader": "^5.2.0",
-    "vue-router": "^4.0.3",
+    "vue-router": "^4.2.4",
     "vue3-qrcode-reader": "^0.0.1",
     "vuex": "^4.0.0"
   },

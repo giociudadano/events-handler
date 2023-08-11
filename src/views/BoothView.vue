@@ -1,16 +1,33 @@
 <template>
-  <section class="hero is-fullheight is-white-1">
-    <div class="about">Event Name: {{ $route.params.event }}</div>
-    <div class="about">BoothId: {{ $route.params.boothId }}</div>
-    <p>{{ error }}</p>
-    <p>{{ decodedString }}</p>
-  </section>
-  <section>
+  <br /><br /><br /><br /><br /><br />
+  <div class="container">
     <div class="box">
+      <div class="about">Event Name: {{ eventName }}</div>
+      <div class="about">Booth Id: {{ $route.params.boothId }}</div>
       <p>{{ error }}</p>
-      <qrcode-stream @init="onInit" @decode="onDecode"></qrcode-stream>
+      <p>{{ decodedString }}</p>
     </div>
-  </section>
+    <div class="box">
+      <button
+        @click="startQRScanner"
+        v-if="!qrScannerActive"
+        class="button is-link"
+      >
+        Start QR Scanner
+      </button>
+      <button
+        @click="stopQRScanner"
+        v-if="qrScannerActive"
+        class="button is-link"
+      >
+        Stop QR Scanner
+      </button>
+      <div v-if="qrScannerActive">
+        <p>{{ error }}</p>
+        <qrcode-stream @init="onInit" @decode="onDecode"></qrcode-stream>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -18,6 +35,7 @@ import { QrcodeStream } from 'vue3-qrcode-reader';
 export default {
   data() {
     return {
+      qrScannerActive: false,
       error: '',
       decodedString: '',
       torch: false
@@ -28,6 +46,13 @@ export default {
     QrcodeStream
   },
   methods: {
+    startQRScanner() {
+      this.qrScannerActive = true;
+    },
+    stopQRScanner() {
+      this.qrScannerActive = false;
+      this.decodedString = ''; // Clear decoded string when stopping
+    },
     async onInit() {
       try {
         // Do not await the promise here to ask for camera access permission every time
