@@ -8,5 +8,6 @@ const router = require('express').Router();
 require('./sampleApiRequest')(router);
 // Add additional API endpoints below
 require('./getEvents')(router);
+require('./getBooths')(router);
 
 module.exports = router;
