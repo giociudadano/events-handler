@@ -5,37 +5,49 @@
         <div class="columns is-centered is-vcentered">
           <div class="column is-3">
             <div class="box">
-              <div v-show="!views.dropdown">
+              <div v-show="loading.dropdown">
                 <div class="loader is-loading"></div>
               </div>
-              <div v-show="views.dropdown">
-                <label class="label is-small">Event Name</label>
-                <p>{{ event.event_name }}</p>
+              <div v-show="!loading.dropdown && !views.dropdown">
+                <small id="error-handler" class="error-handler"></small>
               </div>
-              <!--
-              <br />
-              <label for="boothSelector">Select Booth:</label>
-              <div class="dropdown is-active">
-                <div class="dropdown-trigger">
-                  <div class="select">
-                    <select v-model="selectedBooth" id="boothSelector">
-                      <option
-                        v-for="booth in booths"
-                        :value="booth"
-                        :key="booth"
-                      >
-                        {{ booth }}
-                      </option>
-                    </select>
+              <div v-show="views.dropdown">
+                <div class="field">
+                  <label class="label is-small">Event Name</label>
+                  <input
+                    class="input is-small is-primary"
+                    type="text"
+                    :value="event ? event.event_name : ''"
+                    disabled
+                  />
+                </div>
+                <div class="field">
+                  <label class="label is-small">Select Booth</label>
+                  <div class="control is-expanded">
+                    <div class="select is-link is-small is-fullwidth">
+                      <select id="booth-selector" @change="onBoothChange">
+                        <option>Select a booth</option>
+                        <option
+                          v-for="booth in event ? event.booths : []"
+                          :value="booth"
+                          :key="booth"
+                        >
+                          {{ booth }}
+                        </option>
+                      </select>
+                    </div>
                   </div>
                 </div>
+                <div class="field">
+                  <button class="button is-primary is-small">
+                    <router-link
+                      :to="`/checker/${this.event.event_name}/${this.input.selectedBooth}`"
+                      style="color: white"
+                      >Go to Booth</router-link
+                    >
+                  </button>
+                </div>
               </div>
-              <button class="button is-primary">
-                <router-link :to="`/checker/${eventName}/${selectedBooth}`"
-                  >Go to Booth</router-link
-                >
-              </button>
-              -->
             </div>
           </div>
         </div>
@@ -48,35 +60,67 @@
 .is-white-1 {
   background-color: rgb(235, 235, 235);
 }
+
+.error-handler {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f14668;
+}
 </style>
 
 <script>
 import axios from 'axios';
+
 export default {
   data() {
     return {
       params: {
         event: null
       },
-      event: {
-        event_name: null
+      input: {
+        selectedBooth: null
       },
+      event: {},
       views: {
         dropdown: false
+      },
+      loading: {
+        dropdown: true
       }
     };
   },
-  async mounted() {
+  methods: {
+    async getEvents() {
+      this.event = await new Promise((resolve, reject) => {
+        axios
+          .get(`http://localhost:8081/api/getEvents?event=${this.params.event}`)
+          .then(response => {
+            console.log('this should run if success');
+            this.views.dropdown = true;
+            resolve(response.data.data);
+          })
+          .catch(error => {
+            console.log(error.response.data);
+            reject(error.response.data);
+          })
+          .finally(() => {
+            this.loading.dropdown = false;
+          });
+      }).catch(error => {
+        let errorHandler = document.getElementById('error-handler');
+        errorHandler.innerText = error.error;
+      });
+    },
+    async onBoothChange() {
+      let boothSelector = document.getElementById('booth-selector');
+      if (boothSelector != 'Select a booth') {
+        this.input.selectedBooth = boothSelector.value;
+      }
+    }
+  },
+  mounted() {
     this.params.event = this.$route.params.event;
-    this.event = await new Promise((resolve, reject) => {
-      axios
-        .get(`http://localhost:8081/api/getEvents?event=${this.params.event}`)
-        .then(response => {
-          this.views.dropdown = true;
-          resolve(response.data.data);
-        })
-        .catch(reject);
-    });
+    this.getEvents();
   }
 };
 </script>
