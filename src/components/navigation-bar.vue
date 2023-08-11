@@ -17,7 +17,9 @@
         <a class="navbar-item" :href="links.home">Home</a>
         <a class="navbar-item" :href="links.registration">Registration</a>
         <a class="navbar-item" :href="links.search">Search</a>
-        <a class="navbar-item" :href="links.booths">Booths</a>
+        <router-link to="/checker/:event" class="navbar-item"
+          >Booths</router-link
+        >
         <a class="navbar-item" :href="links.souvenir">Souvenirs</a>
       </div>
       <div class="navbar-end">

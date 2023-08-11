@@ -1,29 +1,41 @@
 <template>
-  <section class="hero is-fullheight is-white-1">
-    <div class="about">Event Name: {{ $store.state.eventName }} <br /></div>
-  </section>
+  <div class="about">
+    <br /><br /><br />
+    <div class="box">
+      Event Name: {{ eventName }} <br />
+      <label for="boothSelector">Select Booth:</label>
+      <select v-model="selectedBooth" id="boothSelector">
+        <option v-for="booth in booths" :value="booth" :key="booth">
+          {{ booth }}
+        </option>
+      </select>
+      <button class="is-primary">
+        <router-link :to="`/checker/${eventName}/${selectedBooth}`"
+          >Go to QR</router-link
+        >
+      </button>
+    </div>
+  </div>
 </template>
-
-<style>
-.is-white-1 {
-  background-color: rgb(245, 245, 245);
-}
-</style>
 
 <script setup>
 import axios from 'axios';
-import { useStore } from 'vuex';
+import { ref, onMounted } from 'vue';
 
-const store = useStore();
+const eventName = ref('');
+const booths = ref([]);
+const selectedBooth = ref('');
 
-axios
-  .get('http://localhost:8081/api/getEvents')
-  .then(response => {
+onMounted(async () => {
+  try {
+    const response = await axios.get(
+      'http://localhost:8081/api/getEvents?event=Event%20A'
+    ); // Replace with the actual API URL
     const data = response.data.data;
-    store.commit('setEventName', data.event_name);
-    console.log('Event Name from Vuex:', store.state.eventName); // Use Vuex
-  })
-  .catch(error => {
+    eventName.value = data.event_name;
+    booths.value = data.booths;
+  } catch (error) {
     console.error('An error occurred:', error);
-  });
+  }
+});
 </script>

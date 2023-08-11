@@ -1,16 +1,17 @@
 <template>
-  <section class="hero is-fullheight is-white-1">
-    <div class="about">Event Name: {{ $route.params.event }}</div>
-    <div class="about">BoothId: {{ $route.params.boothId }}</div>
-    <p>{{ error }}</p>
-    <p>{{ decodedString }}</p>
-  </section>
-  <section>
+  <br /><br /><br /><br /><br /><br />
+  <div class="container">
+    <div class="box">
+      <div class="about">Event Name: {{ eventName }}</div>
+      <div class="about">Booth Id: {{ $route.params.boothId }}</div>
+      <p>{{ error }}</p>
+      <p>{{ decodedString }}</p>
+    </div>
     <div class="box">
       <p>{{ error }}</p>
       <qrcode-stream @init="onInit" @decode="onDecode"></qrcode-stream>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
