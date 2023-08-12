@@ -41,10 +41,11 @@
                 <div class="field">
                   <button class="button is-primary is-small">
                     <router-link
-                      :to="`/checker/${this.event.event_name}/${this.input.selectedBooth}`"
+                      :to="`/checker/${event.event_name}/${$store.state.selectedBooth}`"
                       style="color: white"
-                      >Go to Booth</router-link
                     >
+                      Go to Booth
+                    </router-link>
                   </button>
                 </div>
               </div>
@@ -70,64 +71,25 @@
 </style>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
+import { mapState, mapActions, mapMutations } from 'vuex';
 
 export default {
-  data() {
-    return {
-      params: {
-        event: null
-      },
-      input: {
-        selectedBooth: null
-      },
-      event: {},
-      views: {
-        dropdown: false
-      },
-      loading: {
-        dropdown: true
-      }
-    };
+  computed: {
+    ...mapState(['event', 'loading', 'views'])
   },
   methods: {
-    async getEvents() {
-      this.event = await new Promise((resolve, reject) => {
-        axios
-          .get(`http://localhost:8081/api/getEvents?event=${this.params.event}`)
-          .then(response => {
-            this.views.dropdown = true;
-            resolve(response.data.data);
-          })
-          .catch(error => {
-            if (error.message == 'Network Error') {
-              reject(
-                'There was an error with your connection to the server. Please try again later.'
-              );
-            } else if (error.response) {
-              reject(error.response.data.error);
-            } else {
-              reject(error.message);
-            }
-          })
-          .finally(() => {
-            this.loading.dropdown = false;
-          });
-      }).catch(error => {
-        let errorHandler = document.getElementById('error-handler');
-        errorHandler.innerText = error;
-      });
-    },
+    ...mapActions(['fetchEvent']),
+    ...mapMutations(['setSelectedBooth']),
     async onBoothChange() {
       let boothSelector = document.getElementById('booth-selector');
-      if (boothSelector.value != 'Select a booth') {
-        this.input.selectedBooth = boothSelector.value;
+      if (boothSelector.value !== 'Select a booth') {
+        this.$store.commit('setSelectedBooth', boothSelector.value);
       }
     }
   },
-  mounted() {
-    this.params.event = this.$route.params.event;
-    this.getEvents();
+  async mounted() {
+    this.fetchEvent(this.$route.params.event);
   }
 };
 </script>
