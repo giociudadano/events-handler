@@ -36,12 +36,14 @@ export default createStore({
         commit('setEvent', eventData);
         commit('setDropdownView', true);
       } catch (error) {
+        let errorHandler = document.getElementById('error-handler');
         if (error.message === 'Network Error') {
-          throw 'There was an error with your connection to the server. Please try again later.';
+          errorHandler.innerText =
+            'There was an error with your connection to the server. Please try again later.';
         } else if (error.response) {
-          throw error.response.data.error;
+          errorHandler.innerText = error.response.data.error;
         } else {
-          throw error.message;
+          errorHandler.innerText = error.message;
         }
       } finally {
         commit('setLoading', false);
