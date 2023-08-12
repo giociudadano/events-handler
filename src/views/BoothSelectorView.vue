@@ -39,14 +39,22 @@
                   </div>
                 </div>
                 <div class="field">
-                  <button class="button is-primary is-small">
-                    <router-link
-                      :to="`/checker/${event.event_name}/${$store.state.selectedBooth}`"
-                      style="color: white"
+                  <router-link
+                    :is="
+                      $store.state.selectedBooth == null
+                        ? 'span'
+                        : 'router-link'
+                    "
+                    :to="`/checker/${event.event_name}/${$store.state.selectedBooth}`"
+                    style="color: white"
+                  >
+                    <button
+                      class="button is-primary is-small"
+                      :disabled="$store.state.selectedBooth == null"
                     >
                       Go to Booth
-                    </router-link>
-                  </button>
+                    </button>
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -85,6 +93,8 @@ export default {
       let boothSelector = document.getElementById('booth-selector');
       if (boothSelector.value !== 'Select a booth') {
         this.$store.commit('setSelectedBooth', boothSelector.value);
+      } else {
+        this.$store.commit('setSelectedBooth', null);
       }
     }
   },
