@@ -1,16 +1,18 @@
-// store/index.js
 import { createStore } from 'vuex';
 import axios from 'axios';
+
 export default createStore({
   state: {
     event: {},
     loading: {
-      dropdown: true
+      dropdown: true,
+      eventNameError: false // Add eventNameError state
     },
     views: {
       dropdown: false
     },
-    selectedBooth: null
+    selectedBooth: null,
+    imageUrl: '' // Add imageUrl state
   },
   mutations: {
     setEvent(state, eventData) {
@@ -24,6 +26,12 @@ export default createStore({
     },
     setSelectedBooth(state, booth) {
       state.selectedBooth = booth;
+    },
+    setImageUrl(state, imageUrl) {
+      state.imageUrl = imageUrl;
+    },
+    setEventNameError(state, hasError) {
+      state.loading.eventNameError = hasError;
     }
   },
   actions: {
@@ -35,19 +43,31 @@ export default createStore({
         const eventData = response.data.data;
         commit('setEvent', eventData);
         commit('setDropdownView', true);
+
+        // Determine which background image to use based on the device
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        const imageFileName = isMobile
+          ? eventData.event_background.mobile
+          : eventData.event_background.desktop;
+
+        const imageUrl = require(`@/assets/${imageFileName}`);
+        commit('setImageUrl', imageUrl);
+        commit('setEventNameError', false);
       } catch (error) {
-        let errorHandler = document.getElementById('error-handler');
-        if (error.message === 'Network Error') {
-          errorHandler.innerText =
-            'There was an error with your connection to the server. Please try again later.';
-        } else if (error.response) {
-          errorHandler.innerText = error.response.data.error;
-        } else {
-          errorHandler.innerText = error.message;
-        }
+        commit('setEventNameError', true);
+        // Handle other errors...
       } finally {
         commit('setLoading', false);
       }
+    },
+    onBoothChange({ commit }, booth) {
+      commit('setSelectedBooth', booth);
+    },
+    clearSelectedBooth({ commit }) {
+      commit('setSelectedBooth', null);
     }
+  },
+  getters: {
+    isBoothSelected: state => state.selectedBooth !== null
   }
 });
