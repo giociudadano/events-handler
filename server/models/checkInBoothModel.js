@@ -2,8 +2,11 @@
 
 module.exports = (mongoose, Schema) => {
   const CheckInBoothSchema = new Schema({
-    booth_name: { type: String }
+    user_id: { type: String },
+    event_name: { type: String },
+    booth_name: { type: String },
+    timestamp: { type: Date }
   });
 
-  return mongoose.model('CheckIns', CheckInBoothSchema);
+  return mongoose.model('Booth-CheckIns', CheckInBoothSchema);
 };
