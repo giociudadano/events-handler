@@ -9,7 +9,7 @@
                 <div class="loader is-loading"></div>
               </div>
               <div v-show="!loading.dropdown && !views.dropdown">
-                <small id="error-handler" class="error-handler"></small>
+                <p id="error-handler" class="error-handler"></p>
               </div>
               <div v-if="views.dropdown">
                 <div class="field">
@@ -65,6 +65,7 @@
   font-size: 12px;
   font-weight: 700;
   color: #f14668;
+  line-height: 1rem;
 }
 </style>
 
@@ -100,15 +101,22 @@ export default {
             resolve(response.data.data);
           })
           .catch(error => {
-            console.log(error.response.data);
-            reject(error.response.data);
+            if (error.message == 'Network Error') {
+              reject(
+                'There was an error with your connection to the server. Please try again later.'
+              );
+            } else if (error.response) {
+              reject(error.response.data.error);
+            } else {
+              reject(error.message);
+            }
           })
           .finally(() => {
             this.loading.dropdown = false;
           });
       }).catch(error => {
         let errorHandler = document.getElementById('error-handler');
-        errorHandler.innerText = error.error;
+        errorHandler.innerText = error;
       });
     },
     async onBoothChange() {
