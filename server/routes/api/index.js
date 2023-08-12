@@ -9,5 +9,6 @@ require('./sampleApiRequest')(router);
 // Add additional API endpoints below
 require('./getEvents')(router);
 require('./getBooths')(router);
+require('./checkInBooth')(router);
 
 module.exports = router;
