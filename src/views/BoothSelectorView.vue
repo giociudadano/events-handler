@@ -2,6 +2,7 @@
   <div
     v-if="!loading.dropdown && views.dropdown"
     :style="{ backgroundImage: `url(${imageUrl})` }"
+    class="is-tablet"
   >
     <div class="hero is-fullheight is-white-1">
       <div class="hero-body hero-body-padding-small">
@@ -93,6 +94,7 @@ export default {
     }
   },
   async mounted() {
+    this.fetchEvent('Event A');
     try {
       await this.fetchEvent('Event A');
     } catch (error) {

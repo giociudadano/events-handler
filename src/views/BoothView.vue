@@ -32,7 +32,6 @@
                 </div>
                 <p>{{ error }}</p>
                 <p>{{ decodedString }}</p>
-
                 <div class="field">
                   <label class="label is-small">Manually Input ID Number</label>
                   <input
@@ -41,7 +40,6 @@
                     v-model="manualInput"
                   />
                 </div>
-
                 <button
                   @click="startQRScanner"
                   v-if="!qrScannerActive"
