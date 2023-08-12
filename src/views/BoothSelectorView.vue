@@ -96,7 +96,6 @@ export default {
         axios
           .get(`http://localhost:8081/api/getEvents?event=${this.params.event}`)
           .then(response => {
-            console.log('this should run if success');
             this.views.dropdown = true;
             resolve(response.data.data);
           })
@@ -121,7 +120,7 @@ export default {
     },
     async onBoothChange() {
       let boothSelector = document.getElementById('booth-selector');
-      if (boothSelector != 'Select a booth') {
+      if (boothSelector.value != 'Select a booth') {
         this.input.selectedBooth = boothSelector.value;
       }
     }

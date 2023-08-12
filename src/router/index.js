@@ -16,7 +16,7 @@ const routes = [
     }
   },
   {
-    path: '/checker/:event/:boothId',
+    path: '/checker/:event/:booth',
     name: 'booth',
     component: () => {
       return import('../views/BoothView.vue');
