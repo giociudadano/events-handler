@@ -35,24 +35,32 @@
                 <button
                   @click="startQRScanner"
                   v-if="!qrScannerActive"
-                  class="button is-link"
+                  class="button is-link is-small"
                 >
                   Start QR Scanner
                 </button>
                 <button
                   @click="stopQRScanner"
                   v-if="qrScannerActive"
-                  class="button is-link"
+                  class="button is-link is-small"
                 >
                   Stop QR Scanner
                 </button>
               </div>
             </div>
           </div>
-          <div class="column is-5" v-if="qrScannerActive">
-            <div v-if="qrScannerActive">
-              <p>{{ error }}</p>
-              <qrcode-stream @init="onInit" @decode="onDecode"></qrcode-stream>
+          <div class="column is-6" v-if="qrScannerActive">
+            <div class="box">
+              <div v-if="loading.camera">
+                <div class="loader is-loading"></div>
+              </div>
+              <div v-show="!loading.camera">
+                <p>{{ error }}</p>
+                <qrcode-stream
+                  @init="onInit"
+                  @decode="onDecode"
+                ></qrcode-stream>
+              </div>
             </div>
           </div>
         </div>
@@ -92,7 +100,8 @@ export default {
         information: false
       },
       loading: {
-        information: true
+        information: true,
+        camera: true
       },
       event: {},
       booth: {},
@@ -160,15 +169,16 @@ export default {
       });
     },
     startQRScanner() {
+      this.loading.camera = true;
       this.qrScannerActive = true;
     },
     stopQRScanner() {
       this.qrScannerActive = false;
       this.decodedString = ''; // Clear decoded string when stopping
     },
-    async onInit() {
+    async onInit(promise) {
       try {
-        // Do not await the promise here to ask for camera access permission every time
+        await promise;
       } catch (error) {
         if (error.name === 'NotAllowedError') {
           this.error = 'user denied camera access permission';
@@ -185,7 +195,7 @@ export default {
           this.error = 'browser seems to be lacking features';
         }
       } finally {
-        // hide loading indicator
+        this.loading.camera = false;
       }
     },
     onDecode(decodedString) {
