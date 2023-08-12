@@ -3,8 +3,7 @@
 const checkInBooth = require('../../utils/checkInBooth');
 
 module.exports = (req, res, next) => {
-  console.log(req.body);
-  checkInBooth({ query: req.query })
+  checkInBooth({ body: req.body })
     .then(response => {
       req.responseData = {
         statusCode: 200,
