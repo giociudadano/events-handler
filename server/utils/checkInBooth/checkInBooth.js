@@ -1,6 +1,7 @@
 'use strict';
 
 const CheckInBoothModel = require('../../models').CheckInBoothModel;
+
 module.exports = ({ body }) => {
   return new Promise((resolve, reject) => {
     CheckInBoothModel.aggregate([
