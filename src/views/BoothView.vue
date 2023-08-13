@@ -1,4 +1,8 @@
 <template>
+  <!-- Bind the background image based on imageUrl -->
+  <div class="is-tablet background-image">
+    <img :src="imageUrl" alt="Event Background" />
+  </div>
   <div class="hero is-fullheight is-white-1">
     <div class="hero-body hero-body-padding-small">
       <div class="container">
@@ -13,11 +17,11 @@
               </div>
               <div v-if="views.information">
                 <div class="field">
-                  <label class="label is-small">Event Name</label>
+                  <label class="label is-small">Booth Name</label>
                   <input
-                    class="input is-small is-primary"
+                    class="input is-small is-link"
                     type="text"
-                    :value="event.event_name"
+                    :value="booth.event_name"
                     disabled
                   />
                 </div>
@@ -32,7 +36,6 @@
                 </div>
                 <p>{{ error }}</p>
                 <p>{{ decodedString }}</p>
-
                 <div class="field">
                   <label class="label is-small">Manually Input ID Number</label>
                   <input
@@ -41,7 +44,6 @@
                     v-model="manualInput"
                   />
                 </div>
-
                 <button
                   @click="startQRScanner"
                   v-if="!qrScannerActive"
@@ -84,7 +86,7 @@
 --></template>
 
 <style>
-.is-white-1 {
+/* .is-white-1 {
   background-color: rgb(235, 235, 235);
 }
 
@@ -93,12 +95,27 @@
   font-weight: 700;
   color: #f14668;
   line-height: 1rem;
+} */
+.background-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2; /* Place the background image behind other content */
+}
+
+.background-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Maintain aspect ratio and cover entire area */
 }
 </style>
 
 <script>
 import axios from 'axios';
 import { QrcodeStream } from 'vue3-qrcode-reader';
+
 export default {
   data() {
     return {
@@ -118,37 +135,51 @@ export default {
       qrScannerActive: false,
       error: '',
       decodedString: '',
-      torch: false
+      torch: false,
+      imageUrl: '' // New imageUrl property
     };
   },
   components: {
     QrcodeStream
   },
   methods: {
-    async getEvents() {
-      this.event = await new Promise((resolve, reject) => {
-        axios
-          .get(`http://localhost:8081/api/getEvents?event=${this.params.event}`)
-          .then(response => {
-            resolve(response.data.data);
-          })
-          .catch(error => {
-            if (error.message == 'Network Error') {
-              reject(
-                'There was an error with your connection to the server. Please try again later.'
-              );
-            } else if (error.response) {
-              reject(error.response.data.error);
-            } else {
-              reject(error.message);
-            }
-          })
-          .finally(() => {});
-      }).catch(error => {
-        let errorHandler = document.getElementById('error-handler');
-        errorHandler.innerText = error;
-      });
+    async fetchEventAndSetImageUrl(eventParams) {
+      try {
+        const eventData = await new Promise((resolve, reject) => {
+          axios
+            .get(`http://localhost:8081/api/getEvents?event=${eventParams}`)
+            .then(response => {
+              resolve(response.data.data);
+            })
+            .catch(error => {
+              reject(error);
+            });
+        });
+
+        // Log the eventData to check if it's fetched correctly
+        console.log('Event Data:', eventData);
+        console.log('Event Name:', eventData.event_name);
+
+        // Set the event data directly in the component
+        this.event = eventData;
+
+        // Determine which background image to use based on the device
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        const imageFileName = isMobile
+          ? eventData.event_background.mobile
+          : eventData.event_background.desktop;
+
+        const imageUrl = require(`@/assets/${imageFileName}`);
+        this.imageUrl = imageUrl; // Set the imageUrl directly in the component data
+        this.$store.commit('setEventNameError', false);
+      } catch (error) {
+        this.$store.commit('setEventNameError', true);
+        // Handle other errors...
+      } finally {
+        this.loading.information = false;
+      }
     },
+
     async getBooths() {
       this.booth = await new Promise((resolve, reject) => {
         axios
@@ -211,13 +242,24 @@ export default {
     onDecode(decodedString) {
       this.decodedString = decodedString;
       //window.location.replace(decodedString)
+    },
+    async getEvents() {
+      try {
+        this.event = await axios.get(
+          `http://localhost:8081/api/getEvents?event=${this.params.event}`
+        );
+      } catch (error) {
+        this.error = 'An error occurred while fetching event data.';
+        console.error(error);
+      }
     }
   },
   mounted() {
     this.params.event = this.$route.params.event;
     this.params.booth = this.$route.params.booth;
-    this.getEvents();
+    this.fetchEventAndSetImageUrl(this.params.event); // Change this line
     this.getBooths();
+    this.getEvents();
   }
 };
 </script>
