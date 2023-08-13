@@ -9,6 +9,7 @@ const models = {
   SampleModel: require('./sampleModel'),
   EventsModel: require('./eventsModel'),
   BoothsModel: require('./boothsModel'),
+  UsersModel: require('./usersModel'),
   CheckInBoothModel: require('./checkInBoothModel')
 };
 

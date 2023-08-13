@@ -1,14 +1,24 @@
 'use strict';
 
 const verifyBoothState = require('./verifyBoothState');
-//const checkInBooth = require('./checkInBooth');
+const verifyUserState = require('./verifyUserState');
+const verifyCheckInState = require('./verifyCheckInState');
+const decrementBoothLimit = require('./decrementBoothLimit');
+const checkInBooth = require('./checkInBooth');
+const generateResponse = require('./generateResponse');
 
 module.exports = async ({ body }) => {
-  try {
-    await verifyBoothState({ body });
-  } catch (error) {
-    return error;
-  }
+  return Promise.resolve(
+    Promise.all([
+      verifyBoothState({ body }),
+      verifyUserState({ body }),
+      verifyCheckInState({ body })
+    ])
+  ).then(() => {
+    decrementBoothLimit({ body });
+    checkInBooth({ body });
+    return generateResponse({ body });
+  });
 
   // Verify if booth is available
   // Verify if user has not already checked in
