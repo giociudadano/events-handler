@@ -17,11 +17,11 @@
               </div>
               <div v-if="views.information">
                 <div class="field">
-                  <label class="label is-small">Booth Name</label>
+                  <label class="label is-small">Event Name</label>
                   <input
-                    class="input is-small is-link"
+                    class="input is-small is-primary"
                     type="text"
-                    :value="booth.event_name"
+                    :value="event.event_name"
                     disabled
                   />
                 </div>
@@ -34,16 +34,24 @@
                     disabled
                   />
                 </div>
-                <p>{{ error }}</p>
-                <p>{{ decodedString }}</p>
+                <!-- <p>{{ error }}</p>
+                <p>{{ decodedString }}</p> -->
                 <div class="field">
-                  <label class="label is-small">Manually Input ID Number</label>
+                  <label class="label is-small">Manual Input</label>
                   <input
                     class="input is-small"
                     type="text"
                     v-model="manualInput"
                   />
                 </div>
+
+                <button
+                  @click="submitManualInput"
+                  class="button is-link is-small"
+                >
+                  Submit ID
+                </button>
+                <br /><br />
                 <button
                   @click="startQRScanner"
                   v-if="!qrScannerActive"
@@ -86,7 +94,7 @@
 --></template>
 
 <style>
-/* .is-white-1 {
+.is-white-1 {
   background-color: rgb(235, 235, 235);
 }
 
@@ -95,20 +103,20 @@
   font-weight: 700;
   color: #f14668;
   line-height: 1rem;
-} */
+}
 .background-image {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -2; /* Place the background image behind other content */
+  z-index: 0; /* Place the background image behind other content */
 }
 
 .background-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Maintain aspect ratio and cover entire area */
+  object-fit: cover;
 }
 </style>
 
@@ -136,7 +144,8 @@ export default {
       error: '',
       decodedString: '',
       torch: false,
-      imageUrl: '' // New imageUrl property
+      imageUrl: '',
+      manualInput: '' // New imageUrl property
     };
   },
   components: {
@@ -145,20 +154,10 @@ export default {
   methods: {
     async fetchEventAndSetImageUrl(eventParams) {
       try {
-        const eventData = await new Promise((resolve, reject) => {
-          axios
-            .get(`http://localhost:8081/api/getEvents?event=${eventParams}`)
-            .then(response => {
-              resolve(response.data.data);
-            })
-            .catch(error => {
-              reject(error);
-            });
-        });
-
-        // Log the eventData to check if it's fetched correctly
-        console.log('Event Data:', eventData);
-        console.log('Event Name:', eventData.event_name);
+        const response = await axios.get(
+          `http://localhost:8081/api/getEvents?event=${eventParams}`
+        );
+        const eventData = response.data.data;
 
         // Set the event data directly in the component
         this.event = eventData;
@@ -179,7 +178,6 @@ export default {
         this.loading.information = false;
       }
     },
-
     async getBooths() {
       this.booth = await new Promise((resolve, reject) => {
         axios
@@ -209,14 +207,14 @@ export default {
         errorHandler.innerText = error;
       });
     },
-    startQRScanner() {
-      this.loading.camera = true;
-      this.qrScannerActive = true;
-    },
-    stopQRScanner() {
-      this.qrScannerActive = false;
-      this.decodedString = ''; // Clear decoded string when stopping
-    },
+    // startQRScanner() {
+    //   this.loading.camera = true;
+    //   this.qrScannerActive = true;
+    // },
+    // stopQRScanner() {
+    //   this.qrScannerActive = false;
+    //   this.decodedString = ''; // Clear decoded string when stopping
+    // },
     async onInit(promise) {
       try {
         await promise;
@@ -239,18 +237,79 @@ export default {
         this.loading.camera = false;
       }
     },
-    onDecode(decodedString) {
-      this.decodedString = decodedString;
-      //window.location.replace(decodedString)
-    },
-    async getEvents() {
+    // onDecode(decodedString) {
+    //   this.decodedString = decodedString;
+    //   //window.location.replace(decodedString)
+    // },
+    // async checkInGuest() {
+    //   try {
+    //     const requestData = {
+    //       user_id: this.manualInput, // Assuming manualInput contains the user ID
+    //       event_name: this.event.event_name,
+    //       booth_name: this.booth.booth_name,
+    //       timestamp: new Date().toISOString()
+    //     };
+
+    //     const response = await axios.post(
+    //       'http://localhost:8081/api/checkInBooth',
+    //       requestData
+    //     );
+
+    //     // Handle the response data (show guest/voucher details, etc.)
+    //     console.log('Check-in response:', response.data);
+    //   } catch (error) {
+    //     // Handle errors...
+    //     console.error('Check-in error:', error);
+    //   }
+    // },
+
+    async startQRScanner() {
+      // Request camera permission here
       try {
-        this.event = await axios.get(
-          `http://localhost:8081/api/getEvents?event=${this.params.event}`
-        );
+        await navigator.mediaDevices.getUserMedia({ video: true });
       } catch (error) {
-        this.error = 'An error occurred while fetching event data.';
-        console.error(error);
+        console.error('Camera access denied:', error);
+        return;
+      }
+
+      this.loading.camera = true;
+      this.qrScannerActive = true;
+    },
+
+    async onDecode(decodedString) {
+      // Assuming decodedString contains the user ID
+      this.decodedString = decodedString;
+      this.manualInput = decodedString; // Populate the manualInput field
+    },
+
+    async submitManualInput() {
+      if (this.manualInput) {
+        await this.checkInGuest(this.manualInput);
+
+        // Close the QR scanner camera
+        this.qrScannerActive = false;
+      }
+    },
+
+    async checkInGuest(userId) {
+      try {
+        const requestData = {
+          user_id: userId,
+          event_name: this.event.event_name,
+          booth_name: this.booth.booth_name,
+          timestamp: new Date().toISOString()
+        };
+
+        const response = await axios.post(
+          'http://localhost:8081/api/checkInBooth',
+          requestData
+        );
+
+        // Handle the response data (show guest/voucher details, etc.)
+        console.log('Check-in response:', response.data);
+      } catch (error) {
+        // Handle errors...
+        console.error('Check-in error:', error);
       }
     }
   },
@@ -259,7 +318,6 @@ export default {
     this.params.booth = this.$route.params.booth;
     this.fetchEventAndSetImageUrl(this.params.event); // Change this line
     this.getBooths();
-    this.getEvents();
   }
 };
 </script>
