@@ -51,6 +51,10 @@
                 >
                   Submit ID
                 </button>
+
+                <p class="error-message">{{ error }}</p>
+                <!-- Add this line to display the error -->
+
                 <br /><br />
                 <button
                   @click="startQRScanner"
@@ -284,16 +288,33 @@ export default {
       // Automatically submit the decoded string
       this.submitManualInput();
     },
-
     async submitManualInput() {
       if (this.manualInput) {
-        // Use the decoded string from QR code as user_id
-        await this.checkInGuest(this.manualInput);
+        try {
+          // Clear previous error message
+          this.error = '';
 
-        // Close the QR scanner camera
-        this.qrScannerActive = false;
+          // Use the decoded string from QR code as user_id
+          await this.checkInGuest(this.manualInput);
+
+          // Close the QR scanner camera
+          this.qrScannerActive = false;
+        } catch (error) {
+          // Handle errors...
+          console.error('Check-in error:', error);
+
+          // Display the error message from the API response on the webpage
+          this.error =
+            error.response.data.error ||
+            error.message ||
+            'An error occurred during check-in.';
+
+          // Clear any previous success message
+          this.successMessage = '';
+        }
       }
     },
+
     async checkInGuest(userId) {
       try {
         const requestData = {
@@ -342,4 +363,11 @@ export default {
     this.getBooths();
   }
 };
+{
+  /* <picture>
+  <source media="(max-width: 799px)" srcset="elva-480w-close-portrait.jpg" />
+  <source media="(min-width: 800px)" srcset="elva-800w.jpg" />
+  <img src="elva-800w.jpg" alt="Chris standing up holding his daughter Elva" />
+</picture> */
+}
 </script>

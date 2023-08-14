@@ -9,7 +9,7 @@ const routes = [
     }
   },
   {
-    path: '/checker/:event',
+    path: '/checker/:event?',
     name: 'booth-selector',
     component: () => {
       return import('../views/BoothSelectorView.vue');
