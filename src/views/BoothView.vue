@@ -317,12 +317,6 @@ export default {
 
         const response = await axios(config);
 
-        // Assuming the response structure is like this:
-        // response.data = {
-        //   transaction_id: '123456',
-        //   username: 'JohnDoe'
-        // }
-
         // Extract transaction ID and username from the response
         const { transaction_id, username } = response.data;
 
