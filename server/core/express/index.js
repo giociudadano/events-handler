@@ -36,6 +36,8 @@ const express = require('express');
 module.exports = () => {
   // Create express app
   let app = express();
+  const cors = require('cors');
+  app.use(cors());
 
   // Initialize routes for the app
   require('./initRoutes')(app);

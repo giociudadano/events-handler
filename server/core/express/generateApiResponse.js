@@ -1,5 +1,4 @@
 'use strict';
-
 const chalk = require('chalk');
 
 /**
@@ -31,6 +30,7 @@ const chalk = require('chalk');
  * @copyright &copy; Itemhound Corp. All rights reserved.
  */
 module.exports = app => {
+  // app.use(cors());
   // If middleware reaches this point, it means that data hasn't been returned
   // yet (e.g. request was also passed to other middleware for logging)
   app.use((req, res, next) => {
@@ -39,6 +39,9 @@ module.exports = app => {
     // If not found, skip and go to the next middleware (e.g. maybe there is
     // an error in processing of the request so pass it to the error handler
     // middleware)
+    res.header(`Access-Control-Allow-Origin`, `*`);
+    res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
+    res.header(`Access-Control-Allow-Headers`, `Content-Type`);
     if (!req.responseData) {
       return next();
     } else {

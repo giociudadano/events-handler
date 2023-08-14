@@ -280,17 +280,20 @@ export default {
       // Assuming decodedString contains the user ID
       this.decodedString = decodedString;
       this.manualInput = decodedString; // Populate the manualInput field
+
+      // Automatically submit the decoded string
+      this.submitManualInput();
     },
 
     async submitManualInput() {
       if (this.manualInput) {
+        // Use the decoded string from QR code as user_id
         await this.checkInGuest(this.manualInput);
 
         // Close the QR scanner camera
         this.qrScannerActive = false;
       }
     },
-
     async checkInGuest(userId) {
       try {
         const requestData = {
@@ -300,16 +303,41 @@ export default {
           timestamp: new Date().toISOString()
         };
 
-        const response = await axios.post(
-          'http://localhost:8081/api/checkInBooth',
-          requestData
-        );
+        const data = JSON.stringify(requestData);
 
-        // Handle the response data (show guest/voucher details, etc.)
-        console.log('Check-in response:', response.data);
+        const config = {
+          method: 'post',
+          maxBodyLength: Infinity,
+          url: 'http://localhost:8081/api/checkInBooth',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: data
+        };
+
+        const response = await axios(config);
+
+        // Assuming the response structure is like this:
+        // response.data = {
+        //   transaction_id: '123456',
+        //   username: 'JohnDoe'
+        // }
+
+        // Extract transaction ID and username from the response
+        const { transaction_id, username } = response.data;
+
+        // Display the information
+        console.log('Transaction ID:', transaction_id);
+        console.log('Username:', username);
       } catch (error) {
         // Handle errors...
         console.error('Check-in error:', error);
+
+        // Display the error message on the webpage
+        this.error = error.message || 'An error occurred during check-in.';
+
+        // You can also clear any previous success message
+        this.successMessage = '';
       }
     }
   },
